@@ -1,26 +1,12 @@
 // ✅ استدعاء المتغيرات والمكتبات
-const { db, collection, addDoc } = require("./firebase");
 require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
 const axios = require('axios');
-const { initializeApp } = require('firebase/app');
+const { db, collection, addDoc } = require('./firebase');
 
 const app = express();
 const PORT = process.env.PORT || 8080;
-
-// ✅ إعداد فايربيس
-const firebaseConfig = {
-  apiKey: process.env.FIREBASE_API_KEY,
-  authDomain: process.env.FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.FIREBASE_PROJECT_ID,
-  storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.FIREBASE_APP_ID
-};
-
-const firebaseApp = initializeApp(firebaseConfig);
-const db = getFirestore(firebaseApp);
 
 // ✅ متغيرات البيئة
 const WHATSAPP_TOKEN = process.env.WHATSAPP_TOKEN;
@@ -28,7 +14,6 @@ const PHONE_NUMBER_ID = process.env.PHONE_NUMBER_ID;
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
 app.use(bodyParser.json());
-
 
 // ✅ Webhook Verification (تحقق فيسبوك)
 app.get('/webhook', (req, res) => {
