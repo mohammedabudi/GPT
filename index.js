@@ -5,7 +5,6 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const axios = require('axios');
 const { initializeApp } = require('firebase/app');
-const { getFirestore, addDoc, serverTimestamp } = require('firebase/firestore');
 
 const app = express();
 const PORT = process.env.PORT || 8080;
