@@ -85,7 +85,10 @@ async function getGPTReply(userText) {
           role: "user",
           content: userText
         }
-      ]
+      ],
+      temperature: 0.8,
+presence_penalty: 0.5,
+frequency_penalty: 0.3,
     }, {
       headers: {
         Authorization: `Bearer ${OPENAI_API_KEY}`,
