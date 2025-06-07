@@ -170,7 +170,12 @@ app.post('/webhook', async (req, res) => {
           'Content-Type': 'application/json'
         }
       });
-
+await addDoc(collection(db, "conversations"), {
+  question: userText,
+  reply: replyText,
+  phone: phoneNumber,
+  timestamp: new Date()
+});
       res.sendStatus(200);
     } catch (err) {
       console.error("❌ فشل بالإرسال إلى واتساب:", err.response?.data || err.message);
