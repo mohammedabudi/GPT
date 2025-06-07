@@ -142,6 +142,14 @@ app.post('/webhook', async (req, res) => {
     const phoneNumber = message.from;
 
     const replyText = await getGPTReply(userText);
+    await addDoc(collection(db, "training_feedback"), {
+  question: userText,
+  bot_reply: replyText,
+  corrected_reply: "", // فارغ بالبداية – يتم تعديله من لوحة الإدارة
+  needs_training: true,
+  reviewed: false,
+  timestamp: new Date()
+});
 
     try {
       await axios.post(`https://graph.facebook.com/v18.0/${PHONE_NUMBER_ID}/messages`, {
