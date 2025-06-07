@@ -1,4 +1,5 @@
 // ✅ استدعاء المتغيرات والمكتبات
+const { db, collection, addDoc } = require("./firebase");
 require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
