@@ -3,7 +3,7 @@ require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
 const axios = require('axios');
-const { db, collection, addDoc } = require('./firebase');
+const { db, collection, addDoc } = require('./firebase.js');
 
 const app = express();
 const PORT = process.env.PORT || 8080;
