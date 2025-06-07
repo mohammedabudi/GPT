@@ -7,7 +7,13 @@ const firebaseConfig = {
   projectId: "trainingfeedback-f788d",
   storageBucket: "trainingfeedback-f788d.appspot.com",
   messagingSenderId: "509836635886",
+  appId: "1:509836635886:web:xxxxxx" // ← إذا ما عندك appId، تقدر تتركه فارغ مؤقتًا
 };
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+module.exports = { db, collection, addDoc };
 require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
