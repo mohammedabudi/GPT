@@ -7,7 +7,6 @@ const firebaseConfig = {
   projectId: "trainingfeedback-f788d",
   storageBucket: "trainingfeedback-f788d.appspot.com",
   messagingSenderId: "509836635886",
-  appId: "1:509836635886:web:xxxxxx" // ← إذا ما عندك appId، تقدر تتركه فارغ مؤقتًا
 };
 
 const firebaseApp = initializeApp(firebaseConfig); 
