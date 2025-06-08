@@ -137,43 +137,52 @@ frequency_penalty: 0.3,
 // ✅ استقبال الرسائل من واتساب والرد عليها
 app.post('/webhook', async (req, res) => {
   const message = req.body?.entry?.[0]?.changes?.[0]?.value?.messages?.[0];
-  if (message && message.text && message.from) {
-    const userText = message.text.body;
-    const phoneNumber = message.from;
+  const phoneNumber = message?.from;
+  const userText = message?.text?.body;
+  const msgId = message?.id;
 
+  // ✅ تأكيد إرسال 200 مباشرة لمنع التكرار من واتساب
+  res.sendStatus(200);
+
+  // ✅ تحقق من وجود الرسالة سابقًا في Firestore
+  if (!msgId || !userText || !phoneNumber) return;
+
+  const msgRef = doc(db, "processed_messages", msgId);
+  const msgSnap = await getDoc(msgRef);
+
+  if (msgSnap.exists()) {
+    console.log("⛔️ الرسالة تمت معالجتها مسبقاً، تجاهل الرد");
+    return;
+  }
+
+  try {
+    // ✅ توليد الرد من OpenAI
     const replyText = await getGPTReply(userText);
-    await addDoc(collection(db, "training_feedback"), {
-  question: userText,
-  bot_reply: replyText,
-  corrected_reply: "", // فارغ بالبداية – يتم تعديله من لوحة الإدارة
-  needs_training: true,
-  reviewed: false,
-  timestamp: new Date()
-});
 
-    try {
-      await axios.post(`https://graph.facebook.com/v18.0/${PHONE_NUMBER_ID}/messages`, {
-        messaging_product: "whatsapp",
-        to: phoneNumber,
-        text: { body: replyText }
-      }, {
-        headers: {
-          Authorization: `Bearer ${WHATSAPP_TOKEN}`,
-          'Content-Type': 'application/json'
-        }
-      });
-await addDoc(collection(db, "conversations"), {
-  question: userText,
-  reply: replyText,
-  phone: phoneNumber,
-  timestamp: new Date()
-});
-      res.sendStatus(200);
-    } catch (err) {
-      console.error("❌ فشل بالإرسال إلى واتساب:", err.response?.data || err.message);
-      res.sendStatus(500);
-    }
-  } else {
+    // ✅ إرسال الرد عبر WhatsApp
+    await axios.post(`https://graph.facebook.com/v18.0/${PHONE_NUMBER_ID}/messages`, {
+      messaging_product: "whatsapp",
+      to: phoneNumber,
+      text: { body: replyText }
+    }, {
+      headers: {
+        Authorization: `Bearer ${WHATSAPP_TOKEN}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    // ✅ حفظ الرسالة كـ "تمت معالجتها"
+    await setDoc(msgRef, {
+      phone: phoneNumber,
+      question: userText,
+      reply: replyText,
+      timestamp: new Date()
+    });
+
+  } catch (err) {
+    console.error("❌ خطأ أثناء الرد أو الحفظ:", err);
+  }
+ else {
     res.sendStatus(404);
   }
 });
