@@ -141,25 +141,21 @@ app.post('/webhook', async (req, res) => {
   const userText = message?.text?.body;
   const msgId = message?.id;
 
-  // ✅ تأكيد إرسال 200 مباشرة لمنع التكرار من واتساب
-  res.sendStatus(200);
+  res.sendStatus(200); // فورًا
 
-  // ✅ تحقق من وجود الرسالة سابقًا في Firestore
   if (!msgId || !userText || !phoneNumber) return;
 
   const msgRef = doc(db, "processed_messages", msgId);
   const msgSnap = await getDoc(msgRef);
 
   if (msgSnap.exists()) {
-    console.log("⛔️ الرسالة تمت معالجتها مسبقاً، تجاهل الرد");
+    console.log("⛔️ الرسالة تم الرد عليها مسبقاً");
     return;
   }
 
   try {
-    // ✅ توليد الرد من OpenAI
     const replyText = await getGPTReply(userText);
 
-    // ✅ إرسال الرد عبر WhatsApp
     await axios.post(`https://graph.facebook.com/v18.0/${PHONE_NUMBER_ID}/messages`, {
       messaging_product: "whatsapp",
       to: phoneNumber,
@@ -171,7 +167,6 @@ app.post('/webhook', async (req, res) => {
       }
     });
 
-    // ✅ حفظ الرسالة كـ "تمت معالجتها"
     await setDoc(msgRef, {
       phone: phoneNumber,
       question: userText,
@@ -180,19 +175,15 @@ app.post('/webhook', async (req, res) => {
     });
 
   } catch (err) {
-    console.error("❌ خطأ أثناء الرد أو الحفظ:", err);
-  }
- else {
-    res.sendStatus(404);
+    console.error("❌ فشل بالرد:", err.response?.data || err.message);
   }
 });
 
-// ✅ فحص جاهزية البوت
+// ✅ جاهزية السيرفر
 app.get('/', (req, res) => {
   res.send("بوت أوركنزا شغّال باستخدام OpenAI 💅✨");
 });
 
-// ✅ تشغيل السيرفر
 app.listen(PORT, () => {
   console.log(`🚀 البوت يعمل على البورت ${PORT}`);
 });
