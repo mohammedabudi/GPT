@@ -4,6 +4,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const axios = require('axios');
 const { db, collection, addDoc } = require('./firebase.js');
+const { doc, getDoc, setDoc } = require("firebase/firestore");
 
 const app = express();
 const PORT = process.env.PORT || 8080;
